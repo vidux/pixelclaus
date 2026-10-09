@@ -1,0 +1,43 @@
+{
+  "name": "@pixelclaus/server",
+  "version": "0.1.0",
+  "description": "PixelClaus MCP server (stdio + Streamable HTTP), REST API and viewer host",
+  "type": "module",
+  "license": "MIT",
+  "author": "Viduranga",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vidux/pixelclaus.git",
+    "directory": "packages/server"
+  },
+  "homepage": "https://github.com/vidux/pixelclaus#readme",
+  "bugs": {
+    "url": "https://github.com/vidux/pixelclaus/issues"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "pixelclaus": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "@pixelclaus/core": "0.1.0",
+    "@pixelclaus/formats": "0.1.0",
+    "express": "^5.2.1",
+    "fflate": "^0.8.3",
+    "sharp": "^0.35.5",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6"
+  }
+}

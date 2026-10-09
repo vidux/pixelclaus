@@ -1,0 +1,67 @@
+{
+  "name": "pixelclaus",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Agent-first pixel art & sprite animation editor exposed to Claude over MCP",
+  "type": "module",
+  "license": "MIT",
+  "author": "Viduranga",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vidux/pixelclaus.git"
+  },
+  "homepage": "https://github.com/vidux/pixelclaus#readme",
+  "bugs": {
+    "url": "https://github.com/vidux/pixelclaus/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "pixel-art",
+    "sprite",
+    "animation",
+    "aseprite",
+    "gamedev"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  },
+  "workspaces": [
+    "packages/core",
+    "packages/formats",
+    "packages/server",
+    "packages/viewer"
+  ],
+  "scripts": {
+    "build": "tsc -b && npm run build -w @pixelclaus/viewer",
+    "build:ts": "tsc -b",
+    "clean": "tsc -b --clean && rm -rf packages/viewer/dist",
+    "typecheck": "tsc -b && npm run typecheck -w @pixelclaus/viewer",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "start": "node packages/server/dist/cli.js serve",
+    "mcp": "node packages/server/dist/cli.js mcp",
+    "dev": "tsx packages/server/src/cli.ts serve",
+    "dev:viewer": "npm run dev -w @pixelclaus/viewer",
+    "docs": "tsx packages/server/scripts/gen-docs.ts",
+    "bench:agents": "tsx packages/server/scripts/bench-agents.ts",
+    "showcase": "tsx examples/showcase.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.20.5",
+    "@vitest/coverage-v8": "^5.0.3",
+    "eslint": "^10.12.0",
+    "prettier": "^3.9.9",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.1",
+    "vite": "^8.3.3",
+    "vitest": "^5.0.3"
+  }
+}

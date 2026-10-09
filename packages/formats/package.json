@@ -1,0 +1,33 @@
+{
+  "name": "@pixelclaus/formats",
+  "version": "0.1.0",
+  "description": "Image, animation, sprite-sheet, palette and .aseprite codecs for PixelClaus (browser-safe)",
+  "type": "module",
+  "license": "MIT",
+  "author": "Viduranga",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vidux/pixelclaus.git",
+    "directory": "packages/formats"
+  },
+  "homepage": "https://github.com/vidux/pixelclaus#readme",
+  "bugs": {
+    "url": "https://github.com/vidux/pixelclaus/issues"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "dependencies": {
+    "@pixelclaus/core": "0.1.0",
+    "fflate": "^0.8.3"
+  }
+}

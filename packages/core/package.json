@@ -1,0 +1,29 @@
+{
+  "name": "@pixelclaus/core",
+  "version": "0.1.0",
+  "description": "Pure TypeScript pixel-art document model, drawing, rendering and analysis engine (no runtime deps, no Node APIs)",
+  "type": "module",
+  "license": "MIT",
+  "author": "Viduranga",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vidux/pixelclaus.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/vidux/pixelclaus#readme",
+  "bugs": {
+    "url": "https://github.com/vidux/pixelclaus/issues"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false
+}

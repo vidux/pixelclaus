@@ -1,0 +1,4 @@
+# LF everywhere, also on Windows checkouts: Prettier and the generated-docs test expect LF
+* text=auto eol=lf
+*.png binary
+*.gif binary
