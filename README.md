@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/pixel-claus.png" width="128" height="128" alt="Pixel Claus, the mascot: a 32×32 pixel-art Santa head">
+  <img src="docs/images/robot.png" width="128" height="128" alt="PixelClaus logo: a 32×32 pixel-art robot">
 </p>
 
 <h1 align="center">PixelClaus</h1>
@@ -31,7 +31,7 @@ hand-placed pixels outside the tools. The calls are in [examples/showcase.ts](ex
 
 <table>
   <tr>
-    <td align="center"><img src="docs/images/pixel-claus-idle.gif" width="192" height="192" alt="Pixel Claus idle animation: a 1 px bob and a blink"></td>
+    <td align="center"><img src="docs/images/robot-idle.gif" width="192" height="192" alt="Robot idle animation: a 1 px bob, a glowing antenna and a blink"></td>
     <td align="center">
       <img src="docs/images/slime-green.gif" width="128" height="128" alt="Green slime bouncing">
       <img src="docs/images/slime-blue.gif" width="128" height="128" alt="Blue slime bouncing">
@@ -40,7 +40,7 @@ hand-placed pixels outside the tools. The calls are in [examples/showcase.ts](ex
     <td align="center"><img src="docs/images/coin-spin.gif" width="128" height="128" alt="Spinning gold coin"></td>
   </tr>
   <tr>
-    <td align="center"><b>Pixel Claus</b> · 32×32<br>idle: 1 px bob + blink, 4 frames</td>
+    <td align="center"><b>Robot</b> · 32×32<br>idle: 1 px bob, antenna glow, blink; 4 frames</td>
     <td align="center"><b>Slime</b> · 16×16<br>squash &amp; stretch; three skins from one export (palette swap)</td>
     <td align="center"><b>Coin</b> · 16×16<br>built from <code>ellipse</code> + <code>shade</code> ops, no grids</td>
   </tr>
@@ -66,15 +66,15 @@ shows every frame with its duration and lowest row.
   <img src="docs/images/agent-filmstrip.png" width="700" alt="Filmstrip view of the slime animation with frame durations">
 </p>
 
-With the pictures come numbers it can act on. Here is part of `analyze {kind:"lint"}` on the mascot:
+With the pictures come numbers it can act on. Here is part of `analyze {kind:"lint"}` on the robot:
 
 ```text
-- [warning] doubles f0: 2 L-shaped corner pixel(s) in 1-px lines ("doubles") at (25,6) (6,14)
-- [info] orphan-pixels f0: 2 interior pixel(s) whose colour appears in none of the 8 neighbours (noise / pillow artefacts) at (11,15) (19,15)
+- [info] orphan-pixels f0: 4 interior pixel(s) whose colour appears in none of the 8 neighbours (noise / pillow artefacts) at (15,2) (10,12) (19,12) (15,27)
   hint: Keep only deliberate highlights; otherwise merge into a neighbouring colour cluster
 ```
 
-(The two "orphans" are the eye highlights, so they stay.)
+(The four "orphans" are deliberate glints on the antenna, the eyes and the chest light, so they stay.
+An earlier draft also got a "doubles" warning at the ears; rounding their corners fixed it.)
 
 ## Features
 
@@ -210,38 +210,40 @@ in `PIXELCLAUS_DATA`. In `serve` mode, import and export paths must stay inside 
 
 ### 4. What a session looks like
 
-These are the calls behind the mascot in the gallery, shortened. `tool` names the tool, and the other
+These are the calls behind the robot in the gallery, shortened. `tool` names the tool, and the other
 fields are its arguments (the full version is in [examples/showcase.ts](examples/showcase.ts)):
 
 ```jsonc
 // 1. a 32×32 project with one layer
-{ "tool": "project_create", "name": "pixel-claus", "width": 32, "height": 32,
-  "palette": "endesga-32", "layers": ["Claus"], "settings": { "lightDirection": "top-left" } }
+{ "tool": "project_create", "name": "robot", "width": 32, "height": 32,
+  "palette": "endesga-32", "layers": ["Robot"], "settings": { "lightDirection": "top-left" } }
 
 // 2. flats as an ASCII grid (legend → palette index), then a 1 px outline around the silhouette
-{ "tool": "draw", "project": "pixel-claus", "ops": [
-  { "op": "grid", "rows": ["........................WWW.....", "…32 rows…"],
-    "legend": { "R": 9, "r": 8, "W": 20, "s": 4, "e": 26 } },
-  { "op": "outline", "side": "outside", "color": 7 } ] }
+{ "tool": "draw", "project": "robot", "ops": [
+  { "op": "grid", "rows": ["...............BB...............", "…32 rows…"],
+    "legend": { "L": 21, "M": 22, "D": 23, "V": 25, "E": 19, "B": 10 } },
+  { "op": "outline", "side": "outside", "color": 24 } ] }
 
 // 3. look at it, check it
-{ "tool": "render", "project": "pixel-claus", "view": "value" }
-{ "tool": "analyze", "project": "pixel-claus", "kind": "lint" }
+{ "tool": "render", "project": "robot", "view": "value" }
+{ "tool": "analyze", "project": "robot", "kind": "lint" }
 
-// 4. animate: copy the frame 3×, bob frame 1 down 1 px, close the eyes on frame 3
-{ "tool": "frame", "project": "pixel-claus", "action": "duplicate", "frame": 0, "count": 3 }
-{ "tool": "cel", "project": "pixel-claus", "action": "move", "layer": "Claus", "frames": [1], "dy": 1 }
-{ "tool": "draw", "project": "pixel-claus", "frame": 3, "ops": [
-  { "op": "grid", "x": 11, "y": 15, "rows": ["ss~~~~~~ss", "ee~~~~~~ee"], "legend": { "s": 4, "e": 26 } } ] }
-{ "tool": "frame", "project": "pixel-claus", "action": "duration", "frames": "all", "durations": [500, 350, 700, 120] }
-{ "tool": "tag", "project": "pixel-claus", "action": "add", "name": "idle", "from": 0, "to": 3 }
+// 4. animate: copy the frame 3×, bob frame 1 down 1 px, light the antenna on frame 2, blink on frame 3
+{ "tool": "frame", "project": "robot", "action": "duplicate", "frame": 0, "count": 3 }
+{ "tool": "cel", "project": "robot", "action": "move", "layer": "Robot", "frames": [1], "dy": 1 }
+{ "tool": "draw", "project": "robot", "ops": [
+  { "op": "grid", "frame": 2, "x": 14, "y": 1, "rows": ["~YY~", "YWYY", "YYYY", "~YY~"], "legend": { "Y": 12, "W": 20 } },
+  { "op": "grid", "frame": 3, "x": 10, "y": 12, "rows": ["VVV~~~~~~VVV", "EEE~~~~~~EEE", "VVV~~~~~~VVV"],
+    "legend": { "V": 25, "E": 19 } } ] }
+{ "tool": "frame", "project": "robot", "action": "duration", "frames": "all", "durations": [500, 350, 700, 120] }
+{ "tool": "tag", "project": "robot", "action": "add", "name": "idle", "from": 0, "to": 3 }
 
 // 5. export
-{ "tool": "export", "project": "pixel-claus", "format": "gif", "tag": "idle", "scale": 6 }
+{ "tool": "export", "project": "robot", "format": "gif", "tag": "idle", "scale": 6 }
 ```
 
-In a grid, `.` is transparent and `~` leaves a pixel unchanged, so the blink is a 10×2 patch. Every tool
-and parameter is listed in [docs/mcp-tools.md](docs/mcp-tools.md).
+In a grid, `.` is transparent and `~` leaves a pixel unchanged, so the blink is a 12×3 patch over the eyes.
+Every tool and parameter is listed in [docs/mcp-tools.md](docs/mcp-tools.md).
 
 ### 5. Built-in guides
 
@@ -258,6 +260,11 @@ official TypeScript SDK to start `pixelclaus mcp` over stdio, draw, render, lint
 npm run build
 npm run showcase -- out/ previews/   # images to out/, the agent's render views to previews/
 ```
+
+[examples/social-banner.ts](examples/social-banner.ts) builds a whole animated scene the same way:
+[examples/social-banner.gif](examples/social-banner.gif), a framed 1080×1080 social banner that loops every 3 s
+(30 frames, 1.4 MB), drawn on 16 layers with 55 tool calls. `npm run banner` draws it again. Both
+scripts share an MCP client and the sprite art in [examples/lib/](examples/lib/).
 
 ## CLI and configuration
 

@@ -56,6 +56,32 @@ the `pixel-art-advisor` agent.
 - From a script, stage exports inside the output folder: moving a file from the C: temp folder to
   another drive fails with EXDEV.
 
+## Scenes and posters
+
+[examples/social-banner.ts](../../../examples/social-banner.ts) draws a framed 1080×1080 animated banner
+(135×135 at 8×). Things that worked:
+
+- **Seamless loops.** Choose the frame count first (30 × 100 ms = 3 s), then make every cycle divide it:
+  a 10-frame hop, a 5-frame coin spin, `sin(2π·k·f/30)` bobs, and snow whose speed × 30 is a whole
+  number of wraps. For a chase of N phases, make the bulb count divisible by N too. The bulb spacing
+  must also divide the distance between the corner bulbs (here 9 px band, 6 px spacing, 84 bulbs).
+- **Static layers once.** Create the project with all its frames, draw sky, frame, ground and text on
+  frame 0, then `cel {action:"link", frames:"all"}` per static layer. Draw animated layers with one
+  `draw` call per frame and `layer` on each op.
+- **Big titles.** `text` (5x7), then `transform {op:"scale", factor:2, method:"scale2x"}`. Scaling
+  re-centres the whole layer on the canvas, so read the new position with
+  `analyze {kind:"stats", layers:[…]}` and put it back with `cel move`.
+- **Extruded title.** Draw the outline first, then `select alpha` of the title layer, `select move
+  {dy:2}`, and fill a layer underneath with that selection as `clip`. If you take the selection before
+  the outline, the shadow shows through the letters' counters.
+- **Shine.** Take a `select color` of the fill colours (not the outline), then draw a moving diagonal
+  `polygon` with that selection as `clip` on a layer above.
+- **Text over particles.** Give text over moving snow or stars a dark `outline`, otherwise a passing
+  flake turns "O" into "Q". Keep dithered gradients away from text and particles: flat bands with a
+  2-row `pattern: "checker"` transition read better, with the band edges placed between text lines.
+- **Size.** The GIF encoder stores full frames: 30 frames at 1080² came to 1.4 MB, well under the
+  5 MB that social networks commonly accept.
+
 ## README gallery
 
 `npm run build && npm run showcase` redraws [docs/images/](../../../docs/images/). Output is

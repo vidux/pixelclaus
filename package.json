@@ -50,7 +50,8 @@
     "dev:viewer": "npm run dev -w @pixelclaus/viewer",
     "docs": "tsx packages/server/scripts/gen-docs.ts",
     "bench:agents": "tsx packages/server/scripts/bench-agents.ts",
-    "showcase": "tsx examples/showcase.ts"
+    "showcase": "tsx examples/showcase.ts",
+    "banner": "tsx examples/social-banner.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

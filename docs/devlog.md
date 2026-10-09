@@ -300,3 +300,33 @@ Trackable log of completed tasks. Newest entries at the bottom. Format: date · 
 - **Tests:** new "the project lock survives rapid hand-offs" (3 stores × 600 lock/release, checks no
   overlap). Against the old code it fails 4/5 runs with EPERM; with the fix 5/5 pass. 631/631 in 3 full
   runs; lint, format, typecheck, build clean.
+
+## 2026-10-09 · Example: animated social banner (examples/social-banner.gif)
+
+- **What:** `examples/social-banner.ts` (`npm run banner`) draws a framed 1080×1080 banner through the
+  built stdio server: 135×135 at 8×, 30 frames × 100 ms = 3 s, seamless loop, 1.42 MB GIF. Marquee
+  bulbs chase around a red-and-gold frame (84 bulbs, 3-phase), snow falls at three depths, a 2× scale2x
+  title with extrusion gets a shine sweep, the robot bobs, blinks and pulses its antenna, the slime
+  hops (with a shadow that shrinks in the air), the coin spins and the heart floats. 16 layers, 55
+  tool calls. The MCP client helpers and the sprite art moved to `examples/lib/` (`mcp.ts`,
+  `sprites.ts`), shared with `showcase.ts`.
+- **Why:** a ready-to-share banner; also exercises scale2x transforms, selections as clips, cel links and
+  per-frame batched draws together.
+- **Tests:** the refactored `showcase.ts` reproduces all 9 gallery files byte for byte; two runs of the
+  banner give identical GIFs; examples pass ESLint, Prettier and a strict `tsc` check. Size limits for
+  social-network GIFs vary and are rarely documented: kept to 1080², ≤ 250 frames and < 5 MB.
+
+## 2026-10-10 · New mascot: a pixel robot
+
+- **What:** The logo, the gallery's 32×32 idle animation, the agent-view render and the social banner now
+  use a robot (`ROBOT`, `ROBOT_LEGEND`, `ROBOT_BLINK`, `ROBOT_GLOW` in `examples/lib/sprites.ts`): idle =
+  1 px bob, antenna glow, blink. Files: `docs/images/robot.png`, `robot-idle.gif`; the old logo and idle
+  GIF are removed. The README session walkthrough and lint excerpt use the robot.
+- **Why:** a neutral mascot with no real-world or cultural character; a robot also fits "pixel art for AI
+  agents".
+- **Also:** the banner keeps snow out of a 2 px box around the subtitle. A flake diagonal to a letter's
+  corner slipped past the 4-connected outline and turned "FOR" into "FQR" (43 such pixels across the 30
+  frames before, 0 now, checked per frame).
+- **Tests:** lint on the robot is down to deliberate glints and the intended bob (outline uses index 24 so
+  it separates from dark backgrounds); the other gallery files regenerate byte-identical; examples pass
+  ESLint, Prettier and strict tsc; link check 0 problems.

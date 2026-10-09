@@ -11,7 +11,7 @@ packages/core      @pixelclaus/core     pure TS engine: model, history, commands
 packages/formats   @pixelclaus/formats  codecs: PNG/APNG/GIF/.aseprite/sprite sheets/palettes/.pxc (browser-safe, uses fflate)
 packages/server    @pixelclaus/server   storage, services, MCP tools (stdio + HTTP), REST API, CLI (Node)
 packages/viewer    @pixelclaus/viewer   static web UI (Vite, vanilla TS) — consumes REST API only
-examples/          scripts that drive the built MCP server (README gallery: npm run showcase)
+examples/          scripts that drive the built MCP server (gallery: npm run showcase; banner GIF: npm run banner)
 docs/              design spec, research, guides, devlog
 ```
 
@@ -31,6 +31,7 @@ npm run mcp            # stdio MCP server (after build)
 npm run docs           # regenerate docs/mcp-tools.md + docs/guides/ from the live tool definitions
 npm run bench:agents   # multi-agent benchmark against the built stdio server (args: agents size frames)
 npm run showcase       # redraw docs/images/ through the built stdio server (args: outDir previewDir)
+npm run banner         # redraw examples/social-banner.gif, a 1080x1080 3 s framed banner (args: outDir previewDir)
 ```
 
 ## Code conventions
