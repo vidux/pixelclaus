@@ -286,3 +286,17 @@ Trackable log of completed tasks. Newest entries at the bottom. Format: date · 
 - **Why:** other developers using Claude Code get the same workflows without re-deriving them.
 - **Tests:** 630/630; lint, format, typecheck, build clean; link checker 0 problems, and it reports a
   missing file, a missing anchor and a missing image when given broken links.
+
+## 2026-10-09 · Fix: project lock failed with EPERM on Windows (CI)
+
+- **What:** CI (windows-latest, Node 24) failed "concurrent edits of the same project from two processes
+  are all kept". `ProjectStore.lock` creates `.lock` with `flag: 'wx'`. On Windows, creating it right
+  after the previous holder deleted it fails with EPERM (delete still pending), and only EEXIST counted
+  as "held", so the mutation threw. Now `isWindowsBusy(e)` (EPERM/EACCES/EBUSY on win32, shared with
+  `renameReplacing` in `fs-utils.ts`) also means "held, wait". If it never clears before the timeout,
+  the real error is thrown instead of a misleading "busy" CONFLICT.
+- **Why:** a stress run of wx-create vs rm on Windows gave EPERM on ~3% of attempts; real agents in two
+  processes would have seen random failed edits.
+- **Tests:** new "the project lock survives rapid hand-offs" (3 stores × 600 lock/release, checks no
+  overlap). Against the old code it fails 4/5 runs with EPERM; with the fix 5/5 pass. 631/631 in 3 full
+  runs; lint, format, typecheck, build clean.

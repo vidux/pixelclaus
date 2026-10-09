@@ -12,6 +12,7 @@ import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { draw } from '@pixelclaus/core';
 import { createHttpApp, createMcpServer, type AppServices } from '../src/index.js';
+import { ProjectStore } from '../src/storage/project-store.js';
 import { services, tempDir } from './helpers.js';
 
 interface Agent {
@@ -388,6 +389,27 @@ describe('several server processes on one data directory', () => {
     });
     expect(row.value).toEqual(Array.from({ length: 32 }, (_, x) => (x < 16 ? 2 : 3)));
     expect(warnings.join('\n')).not.toMatch(/modified by another process/);
+  }, 60_000);
+
+  it('the project lock survives rapid hand-offs between holders (Windows: EPERM on a pending delete)', async () => {
+    const dir = tempDir();
+    const svc = await services(dir);
+    await svc.projects.create({ name: 'handoff', width: 4, height: 4 });
+    const stores = [0, 1, 2].map(() => new ProjectStore(`${dir}/projects`));
+    let holders = 0;
+    let overlaps = 0;
+    await Promise.all(
+      stores.map(async (store) => {
+        for (let i = 0; i < 600; i++) {
+          const release = await store.lock('handoff');
+          if (++holders > 1) overlaps++;
+          await new Promise((r) => setImmediate(r));
+          holders--;
+          await release();
+        }
+      }),
+    );
+    expect(overlaps).toBe(0);
   }, 60_000);
 
   it('a lock left by a crashed process is broken once stale', async () => {

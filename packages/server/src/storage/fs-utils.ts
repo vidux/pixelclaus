@@ -29,16 +29,21 @@ export async function writeFileAtomic(
 }
 
 // Windows refuses to replace a file while any handle has it open (another agent reading it, antivirus,
-// the search indexer). Those handles are short-lived, so retry for up to ~2.5 s like graceful-fs does.
-const RENAME_BUSY = new Set(['EPERM', 'EACCES', 'EBUSY']);
+// the search indexer), and to create one whose deletion is still pending. Both clear within moments.
+const WINDOWS_BUSY = new Set(['EPERM', 'EACCES', 'EBUSY']);
 
+/** True for the transient Windows errors above (retry them); always false on other platforms. */
+export function isWindowsBusy(e: unknown): boolean {
+  return process.platform === 'win32' && WINDOWS_BUSY.has((e as NodeJS.ErrnoException).code ?? '');
+}
+
+/** rename() that retries for up to ~2.5 s while Windows reports the target busy, like graceful-fs. */
 export async function renameReplacing(from: string, to: string): Promise<void> {
   for (let wait = 5; ; wait *= 2) {
     try {
       return await rename(from, to);
     } catch (e) {
-      const busy = process.platform === 'win32' && RENAME_BUSY.has((e as NodeJS.ErrnoException).code ?? '');
-      if (!busy || wait > 1280) throw e;
+      if (!isWindowsBusy(e) || wait > 1280) throw e;
       await new Promise((r) => setTimeout(r, wait));
     }
   }

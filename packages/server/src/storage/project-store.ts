@@ -30,7 +30,15 @@ import {
   encodeMaskBlob,
   encodePxc,
 } from '@pixelclaus/formats';
-import { exists, fileStamp, mkdirIn, renameReplacing, stampOf, writeFileAtomic } from './fs-utils.js';
+import {
+  exists,
+  fileStamp,
+  isWindowsBusy,
+  mkdirIn,
+  renameReplacing,
+  stampOf,
+  writeFileAtomic,
+} from './fs-utils.js';
 
 export const MANIFEST = 'project.json';
 export const MANIFEST_FORMAT = 'pixelclaus-project';
@@ -350,6 +358,7 @@ export class ProjectStore {
     const timeoutMs = opts.timeoutMs ?? 15_000;
     const staleMs = opts.staleMs ?? 60_000;
     const start = Date.now();
+    let lastError: unknown;
     for (let wait = 2; ; wait = Math.min(wait * 2, 50)) {
       try {
         await writeFile(file, `${process.pid} ${new Date().toISOString()}`, { flag: 'wx' });
@@ -365,7 +374,9 @@ export class ProjectStore {
             'It may have been deleted; list projects with project_list',
           );
         }
-        if (code !== 'EEXIST') throw e;
+        // Windows: EPERM while the previous holder's .lock is still being deleted; wait like for EEXIST
+        if (code !== 'EEXIST' && !isWindowsBusy(e)) throw e;
+        lastError = code === 'EEXIST' ? undefined : e;
       }
       const age = await stat(file).then(
         (st) => Date.now() - st.mtimeMs,
@@ -376,6 +387,7 @@ export class ProjectStore {
         continue;
       }
       if (Date.now() - start > timeoutMs) {
+        if (lastError) throw lastError; // never cleared: a real permission problem, not a busy project
         throw new PixelClausError(
           'CONFLICT',
           `Project '${id}' is busy in another PixelClaus process`,

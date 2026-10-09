@@ -209,7 +209,9 @@ sharing a project see a consistent, ordered history.
   sessions each start their own `pixelclaus mcp`.
   - Every mutation holds a per-project lock file (`.lock`, created exclusively, broken after 60 s if
     its process crashed) from load to save. Edits from different processes are therefore applied one
-    after another, with a reload in between, instead of overwriting each other.
+    after another, with a reload in between, instead of overwriting each other. On Windows, creating
+    `.lock` right after the previous holder deleted it can fail with EPERM (the delete is still
+    pending); that counts as "held" and is retried like EEXIST.
   - The manifest is identified by a stamp of inode, mtime and size. Atomic rename-replace changes the
     inode on every save, so two saves within one timestamp tick are still told apart.
   - Saves, exports and thumbnails never create a project folder that another session or process has

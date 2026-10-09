@@ -1,6 +1,6 @@
 ---
 name: windows-portability
-description: Keeping PixelClaus code and tests working on Windows as well as Linux/macOS (CI runs both) - symlinks in tests (use junctions), dynamic imports of absolute paths (file URLs), path assertions (basename, drive letters), replacing files that another reader holds open (renameReplacing), sharp keeping files locked, temp-dir cleanup, renames across drives (EXDEV), CRLF checkouts, Node loader hooks, and how to tell a Windows-only failure from a real regression. Use when a test fails only on Windows, when writing tests that touch the filesystem or spawn processes, or when changing storage code.
+description: Keeping PixelClaus code and tests working on Windows as well as Linux/macOS (CI runs both) - symlinks in tests (use junctions), dynamic imports of absolute paths (file URLs), path assertions (basename, drive letters), replacing files that another reader holds open (renameReplacing), re-creating a just-deleted lock file (EPERM on a pending delete), sharp keeping files locked, temp-dir cleanup, renames across drives (EXDEV), CRLF checkouts, Node loader hooks, and how to tell a Windows-only failure from a real regression. Use when a test fails only on Windows, when writing tests that touch the filesystem or spawn processes, or when changing storage code.
 ---
 
 # Windows portability in PixelClaus
@@ -11,6 +11,7 @@ Each row below happened in this repo; the fix column points to where it is solve
 | Symptom | Cause | Fix (and where) |
 | --- | --- | --- |
 | `EPERM … rename 'x.tmp' -> 'project.json'` | Windows can't replace a file that another handle (an agent reading it, antivirus, the indexer) has open | Use `writeFileAtomic` or `renameReplacing` from `server/src/storage/fs-utils.ts`; they retry EPERM/EACCES/EBUSY for ~2.5 s. Never call `fs.rename` onto an existing file directly. |
+| `EPERM` creating a file with `flag: 'wx'` (e.g. the project `.lock`) | The previous holder just deleted it and Windows still has the delete pending; about 3% of rapid hand-offs hit this | Treat `isWindowsBusy(e)` (`fs-utils.ts`) like EEXIST and retry, as `ProjectStore.lock` does. Throw the real error if it never clears. Test: "the project lock survives rapid hand-offs" in `concurrency.test.ts`. |
 | `EPERM: operation not permitted, symlink` | Symlinks need admin or Developer Mode | In tests: `symlinkSync(target, path, 'junction')` (directories, absolute target; the type is ignored on other platforms). See `hardening.test.ts`. |
 | `ERR_UNSUPPORTED_ESM_URL_SCHEME … Received protocol 'd:'` | `import "D:\\…"` in generated code | Import `pathToFileURL(p).href` (`core/test/qa/guards-recheck.test.ts`). |
 | Path assertions fail | `p.split('/')`, regexes like `/- (\/\S+)/` | `basename(p)` and `join`; regex `((?:[A-Za-z]:)?[\\/]\S+)` (`qa/mcp-qa.test.ts`). |
