@@ -1,6 +1,6 @@
 {
   "name": "pixelclaus",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Agent-first pixel art & sprite animation editor exposed to Claude over MCP",
   "type": "module",
